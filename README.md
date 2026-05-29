@@ -16,8 +16,8 @@ Ask your instructor if stuck.
 
 ## 4 Big Steps
 
-1. **Setup + Download** -- Set up Colab/Drive/GitHub, download the smart-city sensor CSVs, and explore the four sensor tables (traffic, air quality, weather, energy).
-2. **Data Preprocessing** -- Clean bad readings, time-align the sensors into one table, build a congestion label, split into train/val/test, run EDA, and build a feature table for classical ML plus scaled arrays for the neural networks.
+1. **Setup + Download** -- Set up Colab/Drive/GitHub, download the Metro Interstate Traffic Volume dataset, and explore its traffic, weather, and time columns.
+2. **Data Preprocessing** -- Clean bad readings, add time features (hour, day, month, holiday), build a congestion label, split into train/val/test, run EDA, and build a feature table for classical ML plus scaled arrays for the neural networks.
 3. **Training & Evaluation** -- Train and compare many algorithms: classical ML (Logistic Regression, KNN, Decision Tree, Naive Bayes, SVM, Random Forest, XGBoost) and deep learning (a small neural network plus deeper/wider variants), then consolidate metrics and error analysis.
 4. **Write Report** -- Draft the paper, polish figures, build a prediction demo, and prepare the poster and presentation.
 
@@ -31,16 +31,16 @@ Ask your instructor if stuck.
     <tr>
       <td rowspan="2"><b>Setup + Download</b></td>
       <td>1</td>
-      <td>Learn ML basics, tabular/time-series data, and the smart-city sensing problem. Set up Python + Colab + GitHub. Download the sensor CSVs and load your first table</td>
+      <td>Learn ML basics, tabular/time-series data, and the smart-city sensing problem. Set up Python + Colab + GitHub. Download the traffic dataset and load it into a DataFrame</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>Explore all four sensor tables. Understand the columns, the zones, the status flags, and how the readings relate to each other</td>
+      <td>Explore the columns (traffic volume, weather, time). Understand how traffic varies by hour of day, day of week, and weather</td>
     </tr>
     <tr>
       <td rowspan="2"><b>Data Preprocessing</b></td>
       <td>3</td>
-      <td>Clean bad/ERROR readings, time-align traffic with weather and air quality (one row per reading), build a Low/Medium/High congestion label, and split into train/val/test</td>
+      <td>Clean bad/error readings (0 K temps, outliers, duplicate timestamps), add time features (hour, day, month, holiday), build a Low/Medium/High congestion label, and split into train/val/test</td>
     </tr>
     <tr>
       <td>4</td>
@@ -70,7 +70,7 @@ Ask your instructor if stuck.
     </tr>
     <tr>
       <td>10</td>
-      <td>Final paper, poster, presentation. Discuss limitations (small dataset!) and real-world use</td>
+      <td>Final paper, poster, presentation. Discuss limitations (single road sensor, label built from volume) and real-world use</td>
     </tr>
   </tbody>
 </table>
@@ -82,10 +82,12 @@ Ask your instructor if stuck.
 
 ## Dataset
 
-- **Smart City Sensor Data 2026** -- a simulated multi-sensor dataset with four hourly sensor feeds, each tagged by zone (Zone_A/B/C) and a status flag:
-  - **Traffic:** `timestamp, device_id, location, traffic_count, status`
-  - **Air quality:** `timestamp, device_id, location, pm25, co2, temperature, humidity, status`
-  - **Weather:** `timestamp, device_id, location, temperature, humidity, wind_speed, precipitation, status`
-  - **Energy:** `timestamp, device_id, location, energy_usage, power_factor, voltage, current, status`
-- GitHub source: https://github.com/rauffauzanrambe/smart-city-sensor-data-2026 (use the CSVs in `data/raw`).
-- **Note:** these CSVs are small (tens of rows each). That is fine for learning the full ML pipeline end to end, but it means results are noisy and deep models will tend to overfit. Understanding *why* small data limits deep learning is one of the goals of this project, so write about it in your report.
+- **Metro Interstate Traffic Volume (UCI)** -- ~48,000 hourly readings of westbound I-94 traffic near Minneapolis-St Paul (2012-2018), combining a traffic sensor with weather and holiday data. Columns:
+  - `date_time` -- hourly timestamp
+  - `traffic_volume` -- vehicles in that hour (used to build the Low/Medium/High congestion label)
+  - `temp` (Kelvin), `rain_1h`, `snow_1h`, `clouds_all` -- weather sensors
+  - `weather_main`, `weather_description` -- weather category
+  - `holiday` -- US national/regional holiday (or blank)
+- Source: https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume (the notebook downloads `Metro_Interstate_Traffic_Volume.csv.gz` automatically).
+- **Engineered features:** temperature in Celsius, hour-of-day, day-of-week, month, an `is_holiday` flag, and one-hot `weather_main`. The congestion label comes from splitting `traffic_volume` into three equal-sized groups with `pd.qcut`.
+- **Note:** this is a single road sensor, so it captures one location over many years rather than many zones. With tens of thousands of rows the neural networks can actually train, which makes the classical-vs-deep-learning comparison meaningful. Discuss the single-location limitation in your report.
